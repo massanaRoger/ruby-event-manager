@@ -47,16 +47,27 @@ end
 
 def best_hours(contents)
   hash = contents.reduce(Hash.new(0)) do |hash, row|
-    row_arr = row[:regdate].split(" ")
     #"11/23/08 20:44"
     #row_date = Date.strptime(row_arr[0], "%m/%d/%y")
     #p row_date
+    row_arr = row[:regdate].split(" ")
     row_time = Time.strptime(row_arr[1], "%H:%M")
     hash[row_time.hour.to_s] += 1
     hash
   end
   max_hours = hash.values.max
   hash.select {|k, v| v == max_hours}
+end
+
+def best_weekday(contents)
+  hash = contents.reduce(Hash.new(0)) do |hash, row|
+    row_arr = row[:regdate].split(" ")
+    row_date = Date.strptime(row_arr[0], "%m/%d/%y")
+    hash[row_date.wday.to_s] += 1
+    hash
+  end
+  max_day = hash.values.max
+  hash.select {|k, v| v == max_day}
 end
 
 puts 'EventManager initialized.'
@@ -71,7 +82,8 @@ template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
 
 
-puts "The best hours are #{best_hours(contents).keys.join(', ')}"
+#puts "The best hours are #{best_hours(contents).keys.join(', ')}"
+puts "The best day is #{best_weekday(contents).keys.join(', ')}"
 
 
 contents.each do |row|
